@@ -1,18 +1,27 @@
 import './App.css'
+import ClientView from './components/ClientView';
+import CompanyView from './components/CompanyView';
+import InvoiceView from './components/InvoiceView';
+import ListItemsView from './components/ListItemsView';
 import { getInvoice } from './services/GetInvoice'
 
 function App() {
 
   const invoice = getInvoice();
+  const {client, company, items} = invoice;
+  const {address} = client;
 
   return (
     <>
-      <h1>Ejemplo factura</h1>
+      <InvoiceView title={"Ejemplo factura"} invoice={invoice}/>
 
-      <ul>
-        <li>Id: {invoice.id}</li>
-        <li>Nombre: {invoice.name}</li>
-      </ul>
+      <ClientView titleClient={"Datos del cliente"} client={client} 
+                  address={address}/>
+
+      <CompanyView titleCompany={"Datos de la empresa"} company={company}/>
+     
+      <ListItemsView titleItems={"Productos de la factura"} items={items}/>
+
     </>
   )
 }
