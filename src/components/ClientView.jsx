@@ -1,5 +1,6 @@
 
 import React from 'react'
+import PropTypes from 'prop-types'
 
 export default function ClientView({ titleClient, client, address }) {
 
@@ -17,4 +18,10 @@ export default function ClientView({ titleClient, client, address }) {
         </ul>
     </div>
   )
+}
+
+ClientView.propTypes = {
+  titleClient: PropTypes.string.isRequired,
+  client: PropTypes.object.isRequired,
+  address: PropTypes.object.isRequired    
 }

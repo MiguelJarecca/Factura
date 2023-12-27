@@ -1,5 +1,6 @@
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import RowItemsView from './RowItemsView'
 
 export default function ListItemsView({titleItems, items}) {
@@ -27,4 +28,9 @@ export default function ListItemsView({titleItems, items}) {
         </table>  
     </div>
   )
+}
+
+ListItemsView.propTypes = {
+    titleItems: PropTypes.string.isRequired,
+    items: PropTypes.array.isRequired
 }

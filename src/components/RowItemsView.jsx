@@ -1,5 +1,6 @@
 
 import React from 'react'
+import PropTypes from 'prop-types'
 
 export default function RowItemsView({product, price, quantity}) {
   return (
@@ -11,4 +12,10 @@ export default function RowItemsView({product, price, quantity}) {
         </tr>
     </>
   )
+}
+
+RowItemsView.propTypes = {
+  product: PropTypes.string.isRequired,
+  price: PropTypes.number.isRequired,
+  quantity: PropTypes.number.isRequired
 }

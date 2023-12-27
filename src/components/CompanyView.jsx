@@ -1,5 +1,6 @@
 
 import React from 'react'
+import PropTypes from 'prop-types'
 
 export default function CompanyView({ titleCompany, company }) {
   return (
@@ -12,4 +13,9 @@ export default function CompanyView({ titleCompany, company }) {
         </ul> 
     </div>
   )
+}
+
+CompanyView.propTypes = {
+  titleCompany: PropTypes.string.isRequired,
+  company: PropTypes.object.isRequired
 }
