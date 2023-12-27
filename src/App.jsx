@@ -1,5 +1,5 @@
 import './App.css'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import ClientView from './components/ClientView';
 import CompanyView from './components/CompanyView';
@@ -7,20 +7,96 @@ import InvoiceView from './components/InvoiceView';
 import ListItemsView from './components/ListItemsView';
 import TotalView from './components/TotalView';
 import { getInvoice } from './services/GetInvoice'
+import { invoice } from './data/Invoice';
 
-function App() {
+const invoiceInitial = {
+    id: 0,
+    name: '',
+    client: {
+        name: '',
+        lastName: '',
+        address: {
+            country: '',
+            city: '',
+            street: '',
+            number: 0
+        }
+    },
+    company: {
+        name: '',
+        fiscalNumber: 0
+    },
+    items: [ ]
+  };
 
-  const invoice = getInvoice();
+const App = () => {
+
+  const [invoice, setInvoice] = useState(invoiceInitial);
+
+  const [items, setItems] = useState([]);
+
+  useEffect(() => {
+    const data = getInvoice();
+    console.log(data);
+    setInvoice(data);
+    setItems(data.items);
+  }, [])
+
   const {total, client, company, items: itemsInitial} = invoice;
   const {address} = client;
 
-  const [productValue, setProductValue] = useState('');
-  const [priceValue, setPriceValue] = useState('');
-  const [quantityValue, setQuantityValue] = useState('');
+  const [invoiceItemsState, setInvoiceItemsState] = useState({
+      product: '',
+      price: '',
+      quantity: '',
+    });
 
-  const [items, setItems] = useState(itemsInitial);
+  const {product, price, quantity} = invoiceItemsState;  
 
   const [counter, setCounter] = useState(4);
+
+  const onInputChange = ({target: {name, value}}) => {
+      console.log(name);
+      console.log(value);
+
+      setInvoiceItemsState({
+        ...invoiceItemsState,
+        [name]:value
+      });
+  }
+
+  const onInvoiceItemsSubmit = (event) => {
+    event.preventDefault();
+
+        if (product.trim().length <= 1) return;
+
+        if (price.trim().length <= 1) return;
+
+        if (isNaN(price.trim())) {
+          alert('Error: ingrese un numero')
+          return;
+        }
+
+        if (quantity.trim().length < 1) return;
+
+        if (isNaN(quantity.trim())) {
+          alert('Error: ingrese un numero')
+          return;
+          }
+
+        setItems([...items,
+           {id: counter, 
+            product: product, 
+            price: +price, //Con el + convertimos de string a number
+            quantity: parseInt(quantity, 10) //Otra forma
+        }]); 
+
+        setInvoiceItemsState({
+          product: '',
+          price: '',
+          quantity: '',
+        }) 
+  }
 
   return (
     <>
@@ -35,58 +111,31 @@ function App() {
 
       <TotalView total={total}/>
 
-      <form onSubmit={event => {
-        event.preventDefault();
-
-        if (productValue.trim().length <= 1) return;
-        if (priceValue.trim().length <= 1) return;
-        if (quantityValue.trim().length < 1) return;
-
-        setItems([...items,
-           {id: counter, 
-            product: productValue, 
-            price: +priceValue, //Con el + convertimos de string a number
-            quantity: parseInt(quantityValue, 10)}]); //Otra forma
-
-        setProductValue('');
-        setPriceValue('');
-        setQuantityValue('');
-        setCounter(counter + 1);    
-        }}>
+      <form onSubmit={event => onInvoiceItemsSubmit(event)}>
 
         <input 
           type="text" 
           name='product' 
-          value={productValue}
+          value={product}
           placeholder='producto'
-          onChange={event => {
-            console.log(event.target.value);
-            setProductValue(event.target.value);
-          }}/>
+          onChange={onInputChange}/>
 
         <input 
           type="text" 
           name='price' 
-          value={priceValue}
+          value={price}
           placeholder='precio'
-          onChange={event => {
-            console.log(event.target.value);
-            setPriceValue(event.target.value);
-          }}/>
+          onChange={onInputChange}/>{/*manera mas directa*/}
 
         <input 
           type="text" 
           name='quantity' 
-          value={quantityValue}
+          value={quantity}
           placeholder='cantidad'
-          onChange={event => {
-            console.log(event.target.value);
-            setQuantityValue(event.target.value);
-          }}/>
+          onChange={event=>onInputChange(event)}/>{/*lo recibimo y lo enviamos*/}
 
         <button type='submit'>Nuevo Item</button>
       </form>
-
     </>
   )
 }
