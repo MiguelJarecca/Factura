@@ -6,8 +6,8 @@ import CompanyView from './components/CompanyView';
 import InvoiceView from './components/InvoiceView';
 import ListItemsView from './components/ListItemsView';
 import TotalView from './components/TotalView';
-import { getInvoice } from './services/GetInvoice'
-import { invoice } from './data/Invoice';
+import { calculateTotal, getInvoice } from './services/GetInvoice'
+import FormItemsView from './components/FormItemsView';
 
 const invoiceInitial = {
     id: 0,
@@ -31,6 +31,12 @@ const invoiceInitial = {
 
 const App = () => {
 
+  const [activeForm, setActiveForm] = useState(false);
+
+  const [total, setTotal] = useState(0); 
+
+  const [counter, setCounter] = useState(4);
+
   const [invoice, setInvoice] = useState(invoiceInitial);
 
   const [items, setItems] = useState([]);
@@ -42,61 +48,29 @@ const App = () => {
     setItems(data.items);
   }, [])
 
-  const {total, client, company, items: itemsInitial} = invoice;
+  const {client, company} = invoice;
   const {address} = client;
 
-  const [invoiceItemsState, setInvoiceItemsState] = useState({
-      product: '',
-      price: '',
-      quantity: '',
-    });
+  useEffect(() => {
+    setTotal(calculateTotal(items));
+    // console.log('se aunmento un nuevo item');
+  },[items]);
 
-  const {product, price, quantity} = invoiceItemsState;  
+  const handlerAddItems = ({product, price, quantity}) => {
 
-  const [counter, setCounter] = useState(4);
-
-  const onInputChange = ({target: {name, value}}) => {
-      console.log(name);
-      console.log(value);
-
-      setInvoiceItemsState({
-        ...invoiceItemsState,
-        [name]:value
-      });
+    setItems([...items,
+        {id: counter, 
+        product: product, 
+        price: +price, //Con el + convertimos de string a number
+        quantity: parseInt(quantity, 10) //Otra forma
+    }]); 
+    
+    setCounter(counter + 1);    
   }
 
-  const onInvoiceItemsSubmit = (event) => {
-    event.preventDefault();
-
-        if (product.trim().length <= 1) return;
-
-        if (price.trim().length <= 1) return;
-
-        if (isNaN(price.trim())) {
-          alert('Error: ingrese un numero')
-          return;
-        }
-
-        if (quantity.trim().length < 1) return;
-
-        if (isNaN(quantity.trim())) {
-          alert('Error: ingrese un numero')
-          return;
-          }
-
-        setItems([...items,
-           {id: counter, 
-            product: product, 
-            price: +price, //Con el + convertimos de string a number
-            quantity: parseInt(quantity, 10) //Otra forma
-        }]); 
-
-        setInvoiceItemsState({
-          product: '',
-          price: '',
-          quantity: '',
-        }) 
-  }
+  const onActiveForm = () => {
+    setActiveForm(!activeForm)
+  };
 
   return (
     <>
@@ -111,31 +85,10 @@ const App = () => {
 
       <TotalView total={total}/>
 
-      <form onSubmit={event => onInvoiceItemsSubmit(event)}>
+      <button onClick={onActiveForm}>{!activeForm ? 'Nuevo Item' : 'Ocultar Fotmulario'}</button>
 
-        <input 
-          type="text" 
-          name='product' 
-          value={product}
-          placeholder='producto'
-          onChange={onInputChange}/>
-
-        <input 
-          type="text" 
-          name='price' 
-          value={price}
-          placeholder='precio'
-          onChange={onInputChange}/>{/*manera mas directa*/}
-
-        <input 
-          type="text" 
-          name='quantity' 
-          value={quantity}
-          placeholder='cantidad'
-          onChange={event=>onInputChange(event)}/>{/*lo recibimo y lo enviamos*/}
-
-        <button type='submit'>Nuevo Item</button>
-      </form>
+      {!activeForm ?'':<FormItemsView handler={(newItem)=>handlerAddItems(newItem)}/>}
+      
     </>
   )
 }
