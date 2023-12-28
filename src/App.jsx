@@ -68,6 +68,10 @@ const App = () => {
     setCounter(counter + 1);    
   }
 
+  const handlerDeleteItem = (id) => {
+    setItems(items.filter(item => item.id !==id))
+  }
+
   const onActiveForm = () => {
     setActiveForm(!activeForm)
   };
@@ -81,7 +85,8 @@ const App = () => {
 
       <CompanyView titleCompany={"Datos de la empresa"} company={company}/>
      
-      <ListItemsView titleItems={"Productos de la factura"} items={items}/>
+      <ListItemsView titleItems={"Productos de la factura"} items={items}
+        handlerDeleteItem={handlerDeleteItem}/>
 
       <TotalView total={total}/>
 
